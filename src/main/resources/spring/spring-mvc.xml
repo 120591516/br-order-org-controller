@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<!-- 加载属性文件 -->
+
+	<!-- 它背后注册了很多用于解析注解的处理器,其中就包括<context:annotation-config/>配置的注解所使用的处理器 -->
+	<!-- 所以配置了<context:component-scan base-package="">之后,便无需再配置<context:annotation-config> -->
+	<context:component-scan base-package="br.order.org">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+
+	<!-- 启用SpringMVC的注解功能,它会自动注册HandlerMapping、HandlerAdapter、ExceptionResolver的相关实例 -->
+	<mvc:annotation-driven />
+
+	<!-- SpringMVC在超出上传文件限制时，会抛出org.springframework.web.multipart.MaxUploadSizeExceededException -->
+	<!-- 该异常是SpringMVC在检查上传的文件信息时抛出来的，而且此时还没有进入到Controller方法中 -->
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<!-- 遇到MaxUploadSizeExceededException异常时，自动跳转到/WEB-INF/error_fileupload.jsp页面 -->
+				<prop
+					key="org.springframework.web.multipart.MaxUploadSizeExceededException">WEB-INF/error_fileupload</prop>
+				<!-- 处理其它异常(包括Controller抛出的) -->
+				<prop key="java.lang.Throwable">WEB-INF/500</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 开启AOP监听 只对当前配置文件有效 -->
+	<aop:aspectj-autoproxy expose-proxy="true" />
+
+	<!--controller层增加aop -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
+	<!-- 国际化支持 -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:message_zh_CN</value>
+			</list>
+		</property>
+		<property name="cacheSeconds" value="300" />  <!--300秒刷新一次 -->
+		<property name="defaultEncoding" value="UTF-8"></property>
+	</bean>
+
+	<!-- 注入SpringSwaggerConfig对象 -->
+	<bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />
+	<!-- 所有swagger目录的访问，直接访问location指定的目录 -->
+	<mvc:resources mapping="/swagger/**" location="/WEB-INF/swagger/" />
+	<mvc:resources mapping="/uploadImg/**" location="/WEB-INF/uploadImg/" />
+	<!-- 转换器的配置 -->
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<bean class="br.order.org.converter.DateConverter"></bean>
+			</set>
+		</property>
+	</bean>
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="br.order.org.controller.filter.SysInfoFilter"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- 控制器异常处理 -->
+	<bean id="exceptionHandlerExceptionResolver"
+		class="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" />
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10240000" />
+	</bean>
+
+	<!-- 测试环境 -->
+	<beans profile="test">
+		<context:property-placeholder order="1"
+			location="classpath:resource/resource-test.properties"
+			ignore-unresolvable="true" />
+		<bean id="log4jInitialization"
+			class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+			<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+			<property name="targetMethod" value="initLogging" />
+			<property name="arguments">
+				<list>
+					<value>classpath:resource/log4j-test.properties</value>
+				</list>
+			</property>
+		</bean>
+	</beans>
+
+	<!-- 生产环境 -->
+	<beans profile="production">
+		<context:property-placeholder order="1"
+			location="classpath:resource/resource-production.properties"
+			ignore-unresolvable="true" />
+		<bean id="log4jInitialization"
+			class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+			<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+			<property name="targetMethod" value="initLogging" />
+			<property name="arguments">
+				<list>
+					<value>classpath:resource/log4j-production.properties</value>
+				</list>
+			</property>
+		</bean>
+	</beans>
+
+</beans>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<context:property-placeholder location="classpath:resource/*.properties" />
+	<!-- 引用dubbo服务 -->
+	<dubbo:application name="br-order-org-controller" />
+	<dubbo:registry protocol="zookeeper" address="${zookeeper.address}" />
+	<dubbo:reference interface="br.crm.service.org.OrganizationService" id="organizationService" />
+	<dubbo:reference interface="br.crm.service.org.OrgConnService" id="orgConnService" />
+	<dubbo:reference interface="br.crm.service.dict.DictAreaService" id="dictAreaService" />
+	<dubbo:reference interface="br.crm.service.org.OrgCooperationService" id="orgCooperationService" />
+	<dubbo:reference interface="br.crm.service.org.OrgIncomeService" id="orgIncomeService" />
+	<dubbo:reference interface="br.crm.service.org.OrgInvestService" id="orgInvestService" />
+	<dubbo:reference interface="br.crm.service.org.OrgLevelService" id="orgLevelService" />
+	<dubbo:reference interface="br.crm.service.org.OrgSaleService" id="orgSaleService" />
+	<dubbo:reference interface="br.crm.service.org.OrgSoftService" id="orgSoftService" />
+	<dubbo:reference interface="br.crm.service.org.OrgVisitService" id="orgVisitService" />
+	<dubbo:reference interface="br.crm.service.org.OrgWebService" id="orgWebService" />
+	<dubbo:reference interface="br.crm.service.suite.OrgExamSuiteService" id="orgExamSuiteService" />
+	<dubbo:reference interface="br.crm.service.dict.CountryManagerService" id="countryManagerService" />
+	<dubbo:reference interface="br.crm.service.dict.HighIncidenceDiseaseManagerService" id="highIncidenceDiseaseManagerService" />
+	<dubbo:reference interface="br.crm.service.dict.DictHighIncidenceDiseaseService"  id="dictHighIncidenceDiseaseService"/>
+	<dubbo:reference interface="br.crm.service.dict.DictExamSuiteTypeService" id="dictExamSuiteTypeService"/>
+	<dubbo:reference interface="br.crm.service.org.RegisterOrgService" id="registerOrgService" />
+	<dubbo:reference interface="br.crm.service.permission.OrganizationUserService" id="organizationUserService" />
+	<dubbo:reference interface="br.crm.service.permission.OrgUserManagerService" id="orgUserManagerService" />
+	<dubbo:reference interface="br.crm.service.dept.OrganizationDeptUserService" id="organizationDeptUserService" />
+	<dubbo:reference interface="br.crm.service.branch.OrgBranchService" id="orgBranchService" />
+	<dubbo:reference interface="br.crm.service.branch.OrgRestService" id="orgRestService" />
+	<dubbo:reference interface="br.crm.service.suite.OrgBranchSuiteService" id="orgBranchSuiteService" />
+	<dubbo:reference interface="br.crm.service.dept.OrgDeptService" id="orgDeptService" />
+	<!-- 用户角色权限 -->
+	<dubbo:reference interface="br.crm.service.permission.UserPermissionCrmService" id="userPermissionCrmService" />
+	<dubbo:reference interface="br.crm.service.permission.RoleManageCrmService" id="roleManageCrmService" /> 
+	<dubbo:reference interface="br.crm.service.permission.RolePermissionCrmService" id="rolePermissionCrmService" />
+	<dubbo:reference interface="br.crm.service.permission.UserManageCrmService" id="userManageCrmService"/>
+	<dubbo:reference interface="br.crm.service.permission.OrganizationOperationCrmService" id="organizationOperationCrmService"/>
+	<dubbo:reference interface="br.crm.service.examitem.OrgExamItemService" id="orgExamItemService"/>
+	<dubbo:reference interface="br.crm.service.examitem.OrgExamItemTypeService" id="orgExamItemTypeService"/>
+	<dubbo:reference interface="br.crm.service.examitemvalue.OrgExamItemValueService" id="orgExamItemValueService"/>
+	<dubbo:reference interface="br.crm.service.examitem.OrgExamItemUserService" id="orgExamItemUserService"/>
+	
+	<!-- 图片上传 -->
+	<dubbo:reference interface="br.crm.service.dict.DictImgService" id="dictImgService"/>
+
+	<!-- 收费项 -->
+	<dubbo:reference interface="br.crm.service.orgexamfeeitem.OrgExamFeeItemService" id="orgExamFeeItemService"/>
+	<dubbo:reference interface="br.crm.service.orgexamfeeitem.OrgExamFeeItemClassService" id="orgExamFeeItemClassService"/>
+	<dubbo:reference interface="br.crm.service.suite.OrgExamFeeItemSuiteService" id="orgExamFeeItemSuiteService"/>
+	<dubbo:reference interface="br.crm.service.orgexamfeeitem.OrgExamFeeItemDetailService" id="orgExamFeeItemDetailService"/>
+	<!-- Redis -->
+	<dubbo:reference interface="br.order.redis.redis.RedisService" id="RedisService" />
+	<!-- 发送邮件 -->
+	<dubbo:reference interface="br.crm.service.dict.DictEmailService" id="dictEmailService" />
+	<!--订单  -->
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderService" id="customerOrderService" />
+	<dubbo:reference interface="br.crm.service.customer.order.CustomerOrderPayInfoService" id="customerOrderPayInfoService" />
+	<!--病人表  -->
+	<dubbo:reference interface="br.crm.service.patient.PatientService" id="patientService" />
+</beans>
